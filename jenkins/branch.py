@@ -1,9 +1,14 @@
 # coding=utf-8
 import urllib2
 import json
+import argparse
+import sys
+
+from regex import regex_method
 
 
 def get_repos(repo_branch):
+    """Returns a dict of all repos and branches."""
     repos = ['nhclinical', 'openeobs', 'nh-mobile']
     repos.remove(repo_branch['repository'])
 
@@ -53,9 +58,30 @@ def get_branch(json_payload):
     push event payload.
     """
     data = dict(repository=None, branch=None)
-    payload = json.load(json_payload)
+    payload = json.loads(json_payload)
     data['repository'] = payload['repository']['name']
+
+    if not regex_method(payload['ref']):
+        raise Exception("Branch name is incorrect format: %s" % payload['ref'])
+
     branch = payload['ref'].split('/')[-1]
     data['branch'] = branch
     return data
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--payload', type=str, help='GitHub push event payload')
+
+
+def main():
+    print "Starting search ...\n"
+    args = parser.parse_args()
+    pushed = get_branch(args.payload)
+    repos = get_repos(pushed)
+    print repos
+    print "\nFinished!"
+
+
+if __name__ == '__main__':
+    sys.exit(main())
 
