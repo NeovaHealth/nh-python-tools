@@ -1,8 +1,9 @@
 # coding=utf-8
 import urllib2
 import json
-import argparse
 import sys
+
+from optparse import OptionParser
 
 from regex import regex_method
 
@@ -69,14 +70,15 @@ def get_branch(json_payload):
     return data
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--payload', type=str, help='GitHub push event payload')
+parser = OptionParser()
+parser.add_option('-p', '--payload', type=str, dest='payload',
+                  help='GitHub push event payload')
 
 
 def main():
     print "Starting search ...\n"
-    args = parser.parse_args()
-    pushed = get_branch(args.payload)
+    (options, args) = parser.parse_args()
+    pushed = get_branch(options.payload)
     repos = get_repos(pushed)
     print repos
     print "\nFinished!"
