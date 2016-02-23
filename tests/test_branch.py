@@ -1,16 +1,57 @@
 # coding=utf-8
+import json
+
 from unittest import TestCase
 
-from jenkins.branch import get_branch, is_branch, get_repos
+from jenkins.branch import RepoPush, PropertiesBuilder
+from jenkins.utils import is_branch
 
 
-class TestBranch(TestCase):
+class TestPushRepo(TestCase):
 
-    def test_get_branch_returns_a_dict_with_repo_and_branch_keys(self):
-        with open('payload.json') as payload:
-            result = get_branch(payload)
-            self.assertEqual(result['repository'], 'public-repo')
-            self.assertEqual(result['branch'], 'changes')
+    def setUp(self):
+
+        self.json_string = '{"ref": "refs/heads/master", "repository": ' \
+                           '{"name": "public-repo"}}'
+        self.json_string_develop = '{"ref": "refs/heads/develop", ' \
+                                   '"repository": {"name": "public-repo"}}'
+        self.json_string_feature = '{"ref": "refs/heads/f1234_test", ' \
+                                   '"repository": {"name": "public-repo"}}'
+        self.json_string_hotfix = '{"ref": "refs/heads/h1234_test", ' \
+                                  '"repository": {"name": "public-repo"}}'
+
+    def test_PushRepo_has_instance_attributes_name_and_branch(self):
+        result = RepoPush(self.json_string)
+
+        self.assertEqual(result.name, 'public-repo')
+        self.assertEqual(result.branch, 'master')
+
+    def test_PushRepo_is_master_returns_True_when_master_branch(self):
+        result = RepoPush(self.json_string)
+        self.assertEqual(result.is_master(), True)
+
+    def test_PushRepo_is_master_returns_False_when_not_master_branch(self):
+        result = RepoPush(self.json_string_develop)
+        self.assertEqual(result.is_master(), False)
+
+    def test_PushRepo_is_feature_returns_True_when_feature_branch(self):
+        result = RepoPush(self.json_string_feature)
+        self.assertEqual(result.is_feature(), True)
+
+    def test_PushRepo_is_feature_returns_False_when_not_feature_branch(self):
+        result = RepoPush(self.json_string)
+        self.assertEqual(result.is_feature(), False)
+
+    def test_PushRepo_is_hotfix_returns_True_when_hotfix_branch(self):
+        result = RepoPush(self.json_string_hotfix)
+        self.assertEqual(result.is_hotfix(), True)
+
+    def test_PushRepo_is_feature_returns_False_when_not_hotfix_branch(self):
+        result = RepoPush(self.json_string)
+        self.assertEqual(result.is_hotfix(), False)
+
+
+class TestUtils(TestCase):
 
     def test_is_branch_returns(self):
         result = is_branch('develop', 'openeobs')
@@ -19,13 +60,3 @@ class TestBranch(TestCase):
     def test_is_branch_returns_False_if_branch_does_not_exist(self):
         result = is_branch('test', 'openeobs')
         self.assertEqual(result, False)
-
-    def test_get_repos_on_openeobs_develop(self):
-        result = get_repos({'repository': 'openeobs', 'branch': 'develop'})
-        self.assertEqual({'nh-mobile': 'master', 'nhclinical': 'develop',
-                          'openeobs': 'develop'}, result)
-
-    def test_get_repos_on_openeobs_master(self):
-        result = get_repos({'repository': 'openeobs', 'branch': 'master'})
-        self.assertEqual({'nh-mobile': 'master', 'nhclinical': 'master',
-                          'openeobs': 'master'}, result)
