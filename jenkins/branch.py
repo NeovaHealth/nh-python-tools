@@ -2,20 +2,15 @@
 import urllib2
 import json
 import sys
+import re
 
 from optparse import OptionParser
-
-from regex import regex_method
 
 
 class RepoPush(object):
 
     def __init__(self, json_payload):
         self._payload = json.loads(json_payload)
-        if not regex_method(self._payload['ref']):
-            raise Exception(
-                "Branch name is incorrect format: %s" % self._payload['ref']
-            )
 
     @property
     def name(self):
@@ -25,35 +20,33 @@ class RepoPush(object):
     def branch(self):
         return self._payload['ref'].split('/')[-1]
 
+    def choose_branch(self):
+        """Returns branch to build against on other repositories"""
+        if self.branch == 'develop' or self.branch == 'master':
+            return self.branch
+
+        if not re.match('[hf][0-9]+_[a-z_0-9]{4,30}', self.branch):
+            return 'master'
+
+        if re.match('[h]', self.branch):
+            return 'master'
+        else:
+            return self.branch
+
 
 def get_repos(repository):
     """Returns a dict of all repos and branches."""
     repos = ['nhclinical', 'openeobs', 'nh-mobile']
     repos.remove(repository.name)
-
     result = {repository.name: repository.branch}
+
     for repo in repos:
-        if repository.name.startswith('f'):
-            if is_branch(repository.branch, repo):
-                result.update({repo: repository.branch})
-            elif is_branch('develop', repo):
-                result.update({repo: 'develop'})
-            else:
-                result.update({repo: 'master'})
 
-        if repository.branch.startswith('h'):
-            if is_branch(repository.branch, repo):
-                result.update({repo: repository.branch})
-            else:
-                result.update({repo: 'master'})
-
-        if repository.branch == 'develop':
-            if is_branch('develop', repo):
-                result.update({repo: 'develop'})
-            else:
-                result.update({repo: 'master'})
-
-        if repository.branch == 'master':
+        if is_branch(repository.choose_branch(), repo):
+            result.update({repo: repository.choose_branch()})
+        elif is_branch('develop', repo):
+            result.update({repo: 'develop'})
+        else:
             result.update({repo: 'master'})
 
     return result
