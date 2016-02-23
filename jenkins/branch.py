@@ -24,35 +24,49 @@ class RepoPush(object):
         if re.match('[h][0-9]+_[a-z_0-9]{4,30}', self.branch):
             return True
 
+        return False
+
     def is_feature(self):
         if re.match('[f][0-9]+_[a-z_0-9]{4,30}', self.branch):
             return True
 
+        return False
 
-def get_repos(repository):
-    """Returns a dict of all repos and branches."""
-    repos = ['nhclinical', 'openeobs', 'nh-mobile']
-    repos.remove(repository.name)
-    result = {repository.name: repository.branch}
 
-    for repo in repos:
+def get_repositories(pushed_repository):
+    """Gets repositories and their branches for a build."""
+    repositories = ['nhclinical', 'openeobs', 'nh-mobile']
+    repositories.remove(pushed_repository.name)
+    result = {pushed_repository.name: pushed_repository.branch}
 
-        if is_branch(repository.branch, repo):
-            result.update({repo: repository.branch})
-        elif repository.is_hotfix():
-            result.update({repo: 'master'})
-        elif repository.is_feature():
-            if is_branch('develop', repo):
-                result.update({repo: 'develop'})
+    for repository in repositories:
+        result.update(get_repository(pushed_repository, repository))
+
+    return result
+
+
+def get_repository(pushed_repository, other_repository):
+    """Gets required branch based on branch of pushed repository."""
+    result = {}
+
+    if is_branch(pushed_repository.branch, other_repository):
+        result.update({other_repository: pushed_repository.branch})
+    else:
+        if pushed_repository.is_hotfix():
+            result.update({other_repository: 'master'})
+        elif pushed_repository.is_feature():
+            if is_branch('develop', other_repository):
+                result.update({other_repository: 'develop'})
             else:
-                result.update({repo: 'master'})
+                result.update({other_repository: 'master'})
         else:
-            result.update({repo: 'master'})
+            result.update({other_repository: 'master'})
 
     return result
 
 
 def is_branch(branch_name, repository):
+    """Checks if repository has a given remote branch."""
     url = "https://api.github.com/repos/NeovaHealth/" + repository + \
           "/branches/" + branch_name
     try:
@@ -65,7 +79,10 @@ def is_branch(branch_name, repository):
 
 
 def print_repos(repos):
-    """Prints repo for the Jenkins workspace properties file."""
+    """
+    Prints environment variables for the Jenkins workspace
+    properties file.
+    """
     print "OE_BRANCH={r[openeobs]}\nNHC_BRANCH={r[nhclinical]}" \
           "\nNHM_BRANCH={r[nh-mobile]}".format(r=repos)
 
@@ -78,10 +95,9 @@ parser.add_option('-p', '--payload', type=str, dest='payload',
 def main():
     (options, args) = parser.parse_args()
     repo = RepoPush(options.payload)
-    repos = get_repos(repo)
+    repos = get_repositories(repo)
     print_repos(repos)
 
 
 if __name__ == '__main__':
     sys.exit(main())
-
