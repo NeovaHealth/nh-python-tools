@@ -8,34 +8,52 @@ from optparse import OptionParser
 from regex import regex_method
 
 
-def get_repos(repo_branch):
+class RepoPush(object):
+
+    def __init__(self, json_payload):
+        self._payload = json.loads(json_payload)
+        if not regex_method(self._payload['ref']):
+            raise Exception(
+                "Branch name is incorrect format: %s" % self._payload['ref']
+            )
+
+    @property
+    def name(self):
+        return self._payload['repository']['name']
+
+    @property
+    def branch(self):
+        return self._payload['ref'].split('/')[-1]
+
+
+def get_repos(repository):
     """Returns a dict of all repos and branches."""
     repos = ['nhclinical', 'openeobs', 'nh-mobile']
-    repos.remove(repo_branch['repository'])
+    repos.remove(repository.name)
 
-    result = {repo_branch['repository']: repo_branch['branch']}
+    result = {repository.name: repository.branch}
     for repo in repos:
-        if repo_branch['branch'].startswith('f'):
-            if is_branch(repo_branch['branch'], repo):
-                result.update({repo: repo_branch['branch']})
+        if repository.name.startswith('f'):
+            if is_branch(repository.branch, repo):
+                result.update({repo: repository.branch})
             elif is_branch('develop', repo):
                 result.update({repo: 'develop'})
             else:
                 result.update({repo: 'master'})
 
-        if repo_branch['branch'].startswith('h'):
-            if is_branch(repo_branch['branch'], repo):
-                result.update({repo: repo_branch['branch']})
+        if repository.branch.startswith('h'):
+            if is_branch(repository.branch, repo):
+                result.update({repo: repository.branch})
             else:
                 result.update({repo: 'master'})
 
-        if repo_branch['branch'] == 'develop':
+        if repository.branch == 'develop':
             if is_branch('develop', repo):
                 result.update({repo: 'develop'})
             else:
                 result.update({repo: 'master'})
 
-        if repo_branch['branch'] == 'master':
+        if repository.branch == 'master':
             result.update({repo: 'master'})
 
     return result
@@ -53,23 +71,6 @@ def is_branch(branch_name, repository):
     return result
 
 
-def get_branch(json_payload):
-    """
-    Gets branch and repository name from GitHub
-    push event payload.
-    """
-    data = dict(repository=None, branch=None)
-    payload = json.loads(json_payload)
-    data['repository'] = payload['repository']['name']
-
-    if not regex_method(payload['ref']):
-        raise Exception("Branch name is incorrect format: %s" % payload['ref'])
-
-    branch = payload['ref'].split('/')[-1]
-    data['branch'] = branch
-    return data
-
-
 def print_repos(repos):
     """Prints repo for the Jenkins workspace properties file."""
     print "OE_BRANCH={r[openeobs]}\nNHC_BRANCH={r[nhclinical]}" \
@@ -83,8 +84,8 @@ parser.add_option('-p', '--payload', type=str, dest='payload',
 
 def main():
     (options, args) = parser.parse_args()
-    pushed = get_branch(options.payload)
-    repos = get_repos(pushed)
+    repo = RepoPush(options.payload)
+    repos = get_repos(repo)
     print_repos(repos)
 
 
