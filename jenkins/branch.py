@@ -70,18 +70,22 @@ def get_branch(json_payload):
     return data
 
 
+def print_repos(repos):
+    """Prints repo for the Jenkins workspace properties file."""
+    print "OE_BRANCH={r[openeobs]}\nNHC_BRANCH={r[nhclinical]}" \
+          "\nNHM_BRANCH={r[nh-mobile]}".format(r=repos)
+
+
 parser = OptionParser()
 parser.add_option('-p', '--payload', type=str, dest='payload',
                   help='GitHub push event payload')
 
 
 def main():
-    print "Starting search ...\n"
     (options, args) = parser.parse_args()
     pushed = get_branch(options.payload)
     repos = get_repos(pushed)
-    print repos
-    print "\nFinished!"
+    print_repos(repos)
 
 
 if __name__ == '__main__':
