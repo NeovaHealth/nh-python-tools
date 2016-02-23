@@ -20,18 +20,13 @@ class RepoPush(object):
     def branch(self):
         return self._payload['ref'].split('/')[-1]
 
-    def choose_branch(self):
-        """Returns branch to build against on other repositories"""
-        if self.branch == 'develop' or self.branch == 'master':
-            return self.branch
+    def is_hotfix(self):
+        if re.match('[h][0-9]+_[a-z_0-9]{4,30}', self.branch):
+            return True
 
-        if not re.match('[hf][0-9]+_[a-z_0-9]{4,30}', self.branch):
-            return 'master'
-
-        if re.match('[h]', self.branch):
-            return 'master'
-        else:
-            return self.branch
+    def is_feature(self):
+        if re.match('[f][0-9]+_[a-z_0-9]{4,30}', self.branch):
+            return True
 
 
 def get_repos(repository):
@@ -42,10 +37,15 @@ def get_repos(repository):
 
     for repo in repos:
 
-        if is_branch(repository.choose_branch(), repo):
-            result.update({repo: repository.choose_branch()})
-        elif is_branch('develop', repo):
-            result.update({repo: 'develop'})
+        if is_branch(repository.branch, repo):
+            result.update({repo: repository.branch})
+        elif repository.is_hotfix():
+            result.update({repo: 'master'})
+        elif repository.is_feature():
+            if is_branch('develop', repo):
+                result.update({repo: 'develop'})
+            else:
+                result.update({repo: 'master'})
         else:
             result.update({repo: 'master'})
 
