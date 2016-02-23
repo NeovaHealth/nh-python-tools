@@ -13,9 +13,13 @@ parser.add_option('-p', '--payload', type=str, dest='payload',
 
 def main():
     (options, args) = parser.parse_args()
+    environment_variables = ""
     repo = RepoPush(options.payload)
+    environment_variables += "TRIGGER_REPO=" + repo.name + "\n"
+    environment_variables += "TRIGGER_BRANCH=" + repo.branch + "\n"
     repos = PropertiesBuilder(repo, ['nhclinical', 'openeobs', 'nh-mobile'])
-    print make_environment_variables(repos)
+    environment_variables += make_environment_variables(repos)
+    print environment_variables
 
 
 if __name__ == '__main__':

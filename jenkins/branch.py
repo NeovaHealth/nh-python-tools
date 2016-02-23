@@ -44,9 +44,9 @@ Repository = namedtuple('Repository', 'name branch')
 
 class PropertiesBuilder(object):
 
-    def __init__(self, pushed_repository, respositories):
+    def __init__(self, pushed_repository, repositories):
         self._pushed_repository = pushed_repository
-        self._build_repositories = respositories
+        self._build_repositories = repositories
         self.repositories = []
         self.get_repositories()
 
