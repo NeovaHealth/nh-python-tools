@@ -2,7 +2,7 @@
 import sys
 
 from optparse import OptionParser
-from branch import RepoPush, PropertiesBuilder
+from branch import PushEvent, PropertiesBuilder
 from utils import make_environment_variables
 
 
@@ -13,13 +13,9 @@ parser.add_option('-p', '--payload', type=str, dest='payload',
 
 def main():
     (options, args) = parser.parse_args()
-    environment_variables = ""
-    repo = RepoPush(options.payload)
-    environment_variables += "TRIGGER_REPO=" + repo.name + "\n"
-    environment_variables += "TRIGGER_BRANCH=" + repo.branch + "\n"
+    repo = PushEvent(options.payload)
     repos = PropertiesBuilder(repo, ['nhclinical', 'openeobs', 'nh-mobile'])
-    environment_variables += make_environment_variables(repos)
-    print environment_variables
+    print repo.environment_variables + make_environment_variables(repos)
 
 
 if __name__ == '__main__':

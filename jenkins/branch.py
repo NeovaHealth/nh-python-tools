@@ -1,13 +1,15 @@
 # coding=utf-8
 import json
 import re
+import urllib2
 
+from string import punctuation
 from collections import namedtuple
 
 from utils import is_branch
 
 
-class RepoPush(object):
+class PushEvent(object):
 
     def __init__(self, json_payload):
         self._payload = json.loads(json_payload)
@@ -19,6 +21,47 @@ class RepoPush(object):
     @property
     def branch(self):
         return self._payload['ref'].split('/')[-1]
+
+    @property
+    def commit(self):
+        return self._payload['commits'][0]['id']
+
+    @property
+    def message(self):
+        return self._payload['commits'][0]['message']
+
+    @property
+    def committer(self):
+        return self._payload['commits'][0]['committer']['username']
+
+    @property
+    def url(self):
+        return self._payload['commits'][0]['url']
+
+    @property
+    def type(self):
+        if self.is_feature():
+            return "feature"
+        elif self.is_hotfix():
+            return "hotfix"
+        elif self.is_master():
+            return "master"
+        elif self.is_develop():
+            return "develop"
+        else:
+            return "None"
+
+    @property
+    def environment_variables(self):
+        variables = ""
+        variables += "GIT_HASH=" + self.commit + "\n"
+        variables += "GIT_MESSAGE=" + self.message + "\n"
+        variables += "GIT_AUTHOR=" + self.committer + "\n"
+        variables += "GIT_URL=" + self.url + "\n"
+        variables += "GIT_REPO=" + self.name + "\n"
+        variables += "GIT_BRANCH=" + self.branch + "\n"
+        variables += "GIT_TYPE=" + self.type + "\n"
+        return variables
 
     def is_hotfix(self):
         if re.match('[h][0-9]+_[a-z_0-9]{4,30}', self.branch):
@@ -38,8 +81,41 @@ class RepoPush(object):
 
         return False
 
+    def is_develop(self):
+        if self.branch == 'develop':
+            return True
+
+        return False
+
 
 Repository = namedtuple('Repository', 'name branch')
+
+
+class Repository_new(object):
+
+    def __init__(self, name, branch):
+        self.name = name
+        self.branch = branch
+
+    @classmethod
+    def create_repository_from_push_event(cls, push):
+        return cls(push.name, push.branch)
+
+    @property
+    def environment_variable(self):
+        return self.name.translate(None, punctuation).upper() + "_BRANCH"
+
+    def has_branch(self, branch_name):
+        """Checks if repository has a given remote branch."""
+        url = "https://api.github.com/repos/NeovaHealth/" + self.name + \
+              "/branches/" + branch_name
+        try:
+            urllib2.urlopen(url)
+        except urllib2.HTTPError:
+            result = False
+        else:
+            result = True
+        return result
 
 
 class PropertiesBuilder(object):
