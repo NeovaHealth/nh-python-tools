@@ -11,6 +11,8 @@ def make_environment_variables(builders):
             variables += "OE_BRANCH=" + repository.branch + "\n"
         elif repository.name == 'nh-mobile':
             variables += "NHM_BRANCH=" + repository.branch + "\n"
+        elif repository.name == 'nh-helpers':
+            variables += "HELPERS_BRANCH=" + repository.branch + "\n"
 
     return variables
 

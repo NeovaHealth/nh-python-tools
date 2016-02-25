@@ -10,7 +10,7 @@ class Tes_PushEvent(TestCase):
     def setUp(self):
 
         self.json_string = '{"ref": "refs/heads/master", "repository": ' \
-                           '{"name": "public-repo"}, "commits": ' \
+                           '{"name": "public-repo"}, "head_commit": ' \
                            '[{"id": "1", "message": "test_message", ' \
                            '"committer": {"username": "test_user"}, ' \
                            '"url": "http://"}]}'

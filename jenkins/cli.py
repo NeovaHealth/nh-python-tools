@@ -14,7 +14,8 @@ parser.add_option('-p', '--payload', type=str, dest='payload',
 def main():
     (options, args) = parser.parse_args()
     repo = PushEvent(options.payload)
-    repos = PropertiesBuilder(repo, ['nhclinical', 'openeobs', 'nh-mobile'])
+    repos = PropertiesBuilder(
+        repo, ['nhclinical', 'openeobs', 'nh-mobile', 'nh-helpers'])
     print repo.environment_variables + make_environment_variables(repos)
 
 

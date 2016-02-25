@@ -24,19 +24,19 @@ class PushEvent(object):
 
     @property
     def commit(self):
-        return self._payload['commits'][0]['id']
+        return self._payload['head_commit'][0]['id']
 
     @property
     def message(self):
-        return self._payload['commits'][0]['message']
+        return self._payload['head_commit'][0]['message']
 
     @property
     def committer(self):
-        return self._payload['commits'][0]['committer']['username']
+        return self._payload['head_commit'][0]['committer']['username']
 
     @property
     def url(self):
-        return self._payload['commits'][0]['url']
+        return self._payload['head_commit'][0]['url']
 
     @property
     def type(self):
