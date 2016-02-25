@@ -54,7 +54,7 @@ class PushEvent(object):
     def environment_variables(self):
         variables = ""
         variables += "GIT_HASH=" + self.commit + "\n"
-        variables += "GIT_MESSAGE=" + self.message + "\n"
+        variables += "GIT_MESSAGE=" + '\"' + self.message + '\"' + "\n"
         variables += "GIT_AUTHOR=" + self.committer + "\n"
         variables += "GIT_URL=" + self.url + "\n"
         variables += "PUSHED_REPO=" + self.name + "\n"
