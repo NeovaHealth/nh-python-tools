@@ -22,19 +22,19 @@ class PushEvent(object):
 
     @property
     def commit(self):
-        return self._payload['head_commit'][0]['id']
+        return self._payload['head_commit']['id']
 
     @property
     def message(self):
-        return self._payload['head_commit'][0]['message']
+        return self._payload['head_commit']['message']
 
     @property
     def committer(self):
-        return self._payload['head_commit'][0]['committer']['username']
+        return self._payload['head_commit']['committer']['username']
 
     @property
     def url(self):
-        return self._payload['head_commit'][0]['url']
+        return self._payload['head_commit']['url']
 
     @property
     def type(self):
@@ -145,7 +145,7 @@ class PropertiesBuilder(object):
             'Authorization', 'token ' + self._token)
 
         try:
-            urllib2.urlopen(url)
+            print urllib2.urlopen(url).read()
         except urllib2.HTTPError:
             result = False
         else:

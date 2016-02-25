@@ -10,9 +10,9 @@ class TestPushEvent(TestCase):
 
         self.json_string = '{"ref": "refs/heads/master", "repository": ' \
                            '{"name": "public-repo"}, "head_commit": ' \
-                           '[{"id": "1", "message": "test_message", ' \
+                           '{"id": "1", "message": "test_message", ' \
                            '"committer": {"username": "test_user"}, ' \
-                           '"url": "http://"}]}'
+                           '"url": "http://"}}'
 
         self.json_string_develop = '{"ref": "refs/heads/develop", ' \
                                    '"repository": {"name": "public-repo"}}'
