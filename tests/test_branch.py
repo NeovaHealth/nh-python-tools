@@ -1,11 +1,10 @@
 # coding=utf-8
 from unittest import TestCase
 
-from jenkins.branch import PushEvent, PropertiesBuilder, Repository_new
-from jenkins.utils import is_branch
+from jenkins.branch import PushEvent, PropertiesBuilder, RepositoryNew
 
 
-class Tes_PushEvent(TestCase):
+class TestPushEvent(TestCase):
 
     def setUp(self):
 
@@ -93,20 +92,9 @@ class TestRepository(TestCase):
         self.push = PushEvent(self.json_string)
 
     def test_repository(self):
-        r = Repository_new.create_repository_from_push_event(self.push)
+        r = RepositoryNew.create_repository_from_push_event(self.push)
         self.assertEqual(r.name, 'public-repo')
 
     def test_environment_variables(self):
-        r = Repository_new('test_name', 'test_branch')
+        r = RepositoryNew('test_name', 'test_branch')
         self.assertEqual(r.environment_variable, 'TESTNAME_BRANCH')
-
-
-class TestUtils(TestCase):
-
-    def test_is_branch_returns(self):
-        result = is_branch('develop', 'openeobs')
-        self.assertEqual(result, True)
-
-    def test_is_branch_returns_False_if_branch_does_not_exist(self):
-        result = is_branch('test', 'openeobs')
-        self.assertEqual(result, False)
