@@ -12,7 +12,8 @@ class TestPushEvent(TestCase):
                            '{"name": "public-repo"}, "head_commit": ' \
                            '{"id": "1", "message": "test_message", ' \
                            '"committer": {"username": "test_user"}, ' \
-                           '"url": "http://"}}'
+                           '"url": "http://"}, "pusher": {"name": ' \
+                           '"test_pusher"}}'
 
         self.json_string_develop = '{"ref": "refs/heads/develop", ' \
                                    '"repository": {"name": "public-repo"}}'
@@ -71,6 +72,10 @@ class TestPushEvent(TestCase):
         result = PushEvent(self.json_string)
         self.assertEqual(result.committer, "test_user")
 
+    def test_PushEvent_pusher_returns_pusher_of_pusher(self):
+        result = PushEvent(self.json_string)
+        self.assertEqual(result.pusher, 'test_pusher')
+
     def test_PushEvent_url_returns_commit_url(self):
         result = PushEvent(self.json_string)
         self.assertEqual(result.url, "http://")
@@ -78,10 +83,10 @@ class TestPushEvent(TestCase):
     def test_PushEvent_environment_variables_returns_str_of_variables(self):
         result = PushEvent(self.json_string)
         self.assertEqual(result.environment_variables,
-                         'GIT_HASH=1\nGIT_MESSAGE=test_message\n'
-                         'GIT_AUTHOR=test_user\nGIT_URL=http://\n'
-                         'PUSHED_REPO=public-repo\nPUSHED_BRANCH=master\n'
-                         'GIT_TYPE=master\n')
+                         'GIT_HASH=1\nGIT_MESSAGE="test_message"\n'
+                         'GIT_AUTHOR=test_user\nGIT_PUSHER=test_pusher\n'
+                         'GIT_URL=http://\nPUSHED_REPO=public-repo\n'
+                         'PUSHED_BRANCH=master\nGIT_TYPE=master\n')
 
 
 class TestRepository(TestCase):

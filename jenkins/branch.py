@@ -30,6 +30,10 @@ class PushEvent(object):
         return self._payload['head_commit']['message']
 
     @property
+    def pusher(self):
+        return self._payload['pusher']['name']
+
+    @property
     def committer(self):
         return self._payload['head_commit']['committer']['username']
 
@@ -56,6 +60,7 @@ class PushEvent(object):
         variables += "GIT_HASH=" + self.commit + "\n"
         variables += "GIT_MESSAGE=" + '\"' + self.message + '\"' + "\n"
         variables += "GIT_AUTHOR=" + self.committer + "\n"
+        variables += "GIT_PUSHER=" + self.pusher + "\n"
         variables += "GIT_URL=" + self.url + "\n"
         variables += "PUSHED_REPO=" + self.name + "\n"
         variables += "PUSHED_BRANCH=" + self.branch + "\n"
