@@ -17,8 +17,8 @@ def make_environment_variables(builders):
             variables += "VMBUILDER_BRANCH=" + repository.branch + "\n"
         elif repository.name == 'nh-ansible':
             variables += "ANSIBLE_BRANCH=" + repository.branch + "\n"
-        elif repository.name == 'nh-playbook':
-            variables += "PLAYBOOK_BRANCH=" + repository.branch + "\n"
+        elif repository.name == 'nh-playbooks':
+            variables += "PLAYBOOKS_BRANCH=" + repository.branch + "\n"
         elif repository.name == 'nh-vagrant':
             variables += "VAGRANT_BRANCH=" + repository.branch + "\n"
         elif repository.name == 'openeobs-quality-assurance':
