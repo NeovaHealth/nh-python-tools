@@ -80,7 +80,7 @@ class TestPushEvent(TestCase):
         self.assertEqual(result.environment_variables,
                          'GIT_HASH=1\nGIT_MESSAGE=test_message\n'
                          'GIT_AUTHOR=test_user\nGIT_URL=http://\n'
-                         'GIT_REPO=public-repo\nGIT_BRANCH=master\n'
+                         'PUSHED_REPO=public-repo\nPUSHED_BRANCH=master\n'
                          'GIT_TYPE=master\n')
 
 

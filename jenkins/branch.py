@@ -57,8 +57,8 @@ class PushEvent(object):
         variables += "GIT_MESSAGE=" + self.message + "\n"
         variables += "GIT_AUTHOR=" + self.committer + "\n"
         variables += "GIT_URL=" + self.url + "\n"
-        variables += "GIT_REPO=" + self.name + "\n"
-        variables += "GIT_BRANCH=" + self.branch + "\n"
+        variables += "PUSHED_REPO=" + self.name + "\n"
+        variables += "PUSHED_BRANCH=" + self.branch + "\n"
         variables += "GIT_TYPE=" + self.type + "\n"
         return variables
 
