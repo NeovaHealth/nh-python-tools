@@ -1,7 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 
-from jenkins.branch import PushEvent, PropertiesBuilder, RepositoryNew
+from jenkins.branch import PushEvent, PropertiesBuilder, RepositoryNew, GithubEvent
 
 
 class TestPushEvent(TestCase):
@@ -14,13 +14,17 @@ class TestPushEvent(TestCase):
                            '"committer": {"username": "test_user"}, ' \
                            '"url": "http://"}, "pusher": {"name": ' \
                            '"test_pusher"}}'
+        self.json_string = GithubEvent(self.json_string)._payload
 
         self.json_string_develop = '{"ref": "refs/heads/develop", ' \
                                    '"repository": {"name": "public-repo"}}'
+        self.json_string_develop = GithubEvent(self.json_string_develop)._payload
         self.json_string_feature = '{"ref": "refs/heads/f1234_test", ' \
                                    '"repository": {"name": "public-repo"}}'
+        self.json_string_feature = GithubEvent(self.json_string_feature)._payload
         self.json_string_hotfix = '{"ref": "refs/heads/h1234_test", ' \
                                   '"repository": {"name": "public-repo"}}'
+        self.json_string_hotfix = GithubEvent(self.json_string_hotfix)._payload
 
     def test_PushEvent_has_instance_attributes_name_and_branch(self):
         result = PushEvent(self.json_string)
@@ -86,7 +90,7 @@ class TestPushEvent(TestCase):
                          'GIT_HASH=1\nGIT_MESSAGE="test_message"\n'
                          'GIT_AUTHOR=test_user\nGIT_PUSHER=test_pusher\n'
                          'GIT_URL=http://\nPUSHED_REPO=public-repo\n'
-                         'PUSHED_BRANCH=master\nGIT_TYPE=master\n')
+                         'PUSHED_BRANCH=master\nGIT_TYPE=master\nUAT_ON=0')
 
 
 class TestRepository(TestCase):
@@ -94,7 +98,7 @@ class TestRepository(TestCase):
     def setUp(self):
         self.json_string = '{"ref": "refs/heads/master", "repository": ' \
                            '{"name": "public-repo"}}'
-        self.push = PushEvent(self.json_string)
+        self.push = PushEvent(GithubEvent(self.json_string)._payload)
 
     def test_repository(self):
         r = RepositoryNew.create_repository_from_push_event(self.push)

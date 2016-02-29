@@ -16,7 +16,7 @@ parser.add_option('-t', '--token', type=str, dest='token',
 def main():
     (options, args) = parser.parse_args()
     event = GithubEvent(options.payload)
-    repo = PushEvent(options.payload) if event.type == 'push' else PullRequestEvent(options.payload)
+    repo = PushEvent(event._payload) if event.type == 'push' else PullRequestEvent(event._payload)
     repos = PropertiesBuilder(
         repo,
         [
