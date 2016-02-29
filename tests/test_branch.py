@@ -90,7 +90,7 @@ class TestPushEvent(TestCase):
                          'GIT_HASH=1\nGIT_MESSAGE="test_message"\n'
                          'GIT_AUTHOR=test_user\nGIT_PUSHER=test_pusher\n'
                          'GIT_URL=http://\nPUSHED_REPO=public-repo\n'
-                         'PUSHED_BRANCH=master\nGIT_TYPE=master\nUAT_ON=0')
+                         'PUSHED_BRANCH=master\nGIT_TYPE=master\nUAT_ON=0\nPIPELINE_EXIT=0\n')
 
 
 class TestRepository(TestCase):
