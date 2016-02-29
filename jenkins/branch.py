@@ -10,8 +10,8 @@ from collections import namedtuple
 
 class PushEvent(object):
 
-    def __init__(self, json_payload):
-        self._payload = json.loads(json_payload)
+    def __init__(self, payload):
+        self._payload = payload
 
     @property
     def name(self):
@@ -65,6 +65,102 @@ class PushEvent(object):
         variables += "PUSHED_REPO=" + self.name + "\n"
         variables += "PUSHED_BRANCH=" + self.branch + "\n"
         variables += "GIT_TYPE=" + self.type + "\n"
+        variables += "UAT_ON=0"
+        return variables
+
+    def is_hotfix(self):
+        if re.match('[h][0-9]+_[a-z_0-9]{4,30}', self.branch):
+            return True
+
+        return False
+
+    def is_feature(self):
+        if re.match('[f][0-9]+_[a-z_0-9]{4,30}', self.branch):
+            return True
+
+        return False
+
+    def is_master(self):
+        if self.branch == 'master':
+            return True
+
+        return False
+
+    def is_develop(self):
+        if self.branch == 'develop':
+            return True
+
+        return False
+
+
+class GithubEvent(object):
+
+    def __init__(self, json_payload):
+        self._payload = json.loads(json_payload)
+
+    @property
+    def type(self):
+        return 'push' if not self._payload.get('pull_request') else 'pull_request'
+
+
+class PullRequestEvent(object):
+
+    def __init__(self, payload):
+        self._payload = payload
+
+    @property
+    def name(self):
+        return self._payload['repository']['name']
+
+    @property
+    def branch(self):
+        return self._payload['pull_request']['head']['ref']
+
+    @property
+    def commit(self):
+        return self._payload['pull_request']['merge_commit_sha']
+
+    @property
+    def message(self):
+        return self._payload['pull_request']['title']
+
+    @property
+    def pusher(self):
+        return self._payload['pull_request']['user']['login']
+
+    @property
+    def committer(self):
+        return self._payload['sender']['login']
+
+    @property
+    def url(self):
+        return self._payload['pull_request']['url']
+
+    @property
+    def type(self):
+        if self.is_feature():
+            return "feature"
+        elif self.is_hotfix():
+            return "hotfix"
+        elif self.is_master():
+            return "master"
+        elif self.is_develop():
+            return "develop"
+        else:
+            return "None"
+
+    @property
+    def environment_variables(self):
+        variables = ""
+        variables += "GIT_HASH=" + self.commit + "\n"
+        variables += "GIT_MESSAGE=" + '\"' + self.message + '\"' + "\n"
+        variables += "GIT_AUTHOR=" + self.committer + "\n"
+        variables += "GIT_PUSHER=" + self.pusher + "\n"
+        variables += "GIT_URL=" + self.url + "\n"
+        variables += "PUSHED_REPO=" + self.name + "\n"
+        variables += "PUSHED_BRANCH=" + self.branch + "\n"
+        variables += "GIT_TYPE=" + self.type + "\n"
+        variables += "UAT_ON=1"
         return variables
 
     def is_hotfix(self):
