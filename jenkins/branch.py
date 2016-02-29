@@ -65,7 +65,7 @@ class PushEvent(object):
         variables += "PUSHED_REPO=" + self.name + "\n"
         variables += "PUSHED_BRANCH=" + self.branch + "\n"
         variables += "GIT_TYPE=" + self.type + "\n"
-        variables += "UAT_ON=0\n"
+        variables += "UAT_ON=false\n"
         variables += "PIPELINE_RUN=1\n"
         return variables
 
@@ -165,7 +165,7 @@ class PullRequestEvent(object):
         variables += "PUSHED_REPO=" + self.name + "\n"
         variables += "PUSHED_BRANCH=" + self.branch + "\n"
         variables += "GIT_TYPE=" + self.type + "\n"
-        variables += "UAT_ON=1\n"
+        variables += "UAT_ON=true\n"
         variables += "PIPELINE_RUN=0\n" if self.action not in ["opened","reopened"] else "PIPELINE_RUN=1\n"
         return variables
 
