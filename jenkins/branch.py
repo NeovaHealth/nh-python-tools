@@ -166,7 +166,7 @@ class PullRequestEvent(object):
         variables += "PUSHED_BRANCH=" + self.branch + "\n"
         variables += "GIT_TYPE=" + self.type + "\n"
         variables += "UAT_ON=1\n"
-        variables += "PIPELINE_EXIT=1\n" if self.action != "opened" else "PIPELINE_EXIT=0\n"
+        variables += "PIPELINE_EXIT=1\n" if self.action not in ["opened","reopened"] else "PIPELINE_EXIT=0\n"
         return variables
 
     def is_hotfix(self):
