@@ -60,6 +60,13 @@ class TravisEvent(object):
         return "PULL_REQUEST_ID=" + self.pull_request
 
     @property
+    def trigger_type(self):
+        if self.is_pull_request():
+            return "TRIGGER_TYPE=" + "github-pull-request"
+        else:
+            return "TRIGGER_TYPE=" + "git-commit"
+
+    @property
     def environment_variables(self):
         result = ""
         if self.is_pull_request():
@@ -67,7 +74,7 @@ class TravisEvent(object):
 
         result += self.git_hash + '\n' + self.git_repo + '\n' + \
                   self.pushed_branch + '\n' + self.git_type + '\n' + \
-                  self.uat + '\n'
+                  self.uat + '\n' + self.trigger_type + '\n'
         return result
 
     def is_hotfix(self):
