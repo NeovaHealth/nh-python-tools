@@ -43,6 +43,7 @@ def travis(options):
     )
     print repo.environment_variables + make_environment_variables(repos)
 
+
 if __name__ == '__main__':
     (options, args) = parser.parse_args()
     if options.trigger == 'travis':
