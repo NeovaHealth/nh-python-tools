@@ -4,7 +4,6 @@ import re
 import urllib2
 import base64
 
-from string import punctuation
 from collections import namedtuple
 
 
@@ -195,21 +194,6 @@ class PullRequestEvent(object):
 
 
 Repository = namedtuple('Repository', 'name branch')
-
-
-class RepositoryNew(object):
-
-    def __init__(self, name, branch):
-        self.name = name
-        self.branch = branch
-
-    @classmethod
-    def create_repository_from_push_event(cls, push):
-        return cls(push.name, push.branch)
-
-    @property
-    def environment_variable(self):
-        return self.name.translate(None, punctuation).upper() + "_BRANCH"
 
 
 class PropertiesBuilder(object):

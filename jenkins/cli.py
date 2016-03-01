@@ -2,7 +2,8 @@
 import sys
 
 from optparse import OptionParser
-from branch import PushEvent, PropertiesBuilder, GithubEvent, PullRequestEvent
+from travis import TravisEvent
+from branch import PropertiesBuilder
 from utils import make_environment_variables
 
 
@@ -15,8 +16,9 @@ parser.add_option('-t', '--token', type=str, dest='token',
 
 def main():
     (options, args) = parser.parse_args()
-    event = GithubEvent(options.payload)
-    repo = PushEvent(event._payload) if event.type == 'push' else PullRequestEvent(event._payload)
+    repo = TravisEvent(options.payload)
+    # repo = PushEvent(event._payload) if event.type == 'push' else PullRequestEvent(event._payload)
+
     repos = PropertiesBuilder(
         repo,
         [
