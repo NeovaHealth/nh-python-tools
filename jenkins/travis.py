@@ -61,9 +61,13 @@ class TravisEvent(object):
 
     @property
     def environment_variables(self):
-        result = self.git_hash + '\n' + self.git_repo + '\n' + \
+        result = ""
+        if self.is_pull_request():
+            result += self.pull_request_id + '\n'
+
+        result += self.git_hash + '\n' + self.git_repo + '\n' + \
                   self.pushed_branch + '\n' + self.git_type + '\n' + \
-                  self.pull_request_id + '\n' + self.uat + '\n'
+                  self.uat + '\n'
         return result
 
     def is_hotfix(self):
@@ -86,6 +90,12 @@ class TravisEvent(object):
 
     def is_develop(self):
         if self.branch == 'develop':
+            return True
+
+        return False
+
+    def is_pull_request(self):
+        if self.pull_request != 'false':
             return True
 
         return False
