@@ -100,7 +100,10 @@ class GithubEvent(object):
 
     @property
     def type(self):
-        return 'push' if not self._payload.get('pull_request') else 'pull_request'
+        if not self._payload.get('pull_request'):
+            return 'push'
+        else:
+            return 'pull_request'
 
 
 class PullRequestEvent(object):
@@ -165,7 +168,10 @@ class PullRequestEvent(object):
         variables += "PUSHED_BRANCH=" + self.branch + "\n"
         variables += "GIT_TYPE=" + self.type + "\n"
         variables += "UAT_ON=true\n"
-        variables += "PIPELINE_RUN=0\n" if self.action not in ["opened","reopened"] else "PIPELINE_RUN=1\n"
+        if self.action not in ["opened", "reopened"]:
+            variables += "PIPELINE_RUN=0\n"
+        else:
+            variables += "PIPELINE_RUN=1\n"
         return variables
 
     def is_hotfix(self):
@@ -196,7 +202,7 @@ class PullRequestEvent(object):
 Repository = namedtuple('Repository', 'name branch')
 
 
-class PropertiesBuilder(object):
+class BranchPicker(object):
 
     def __init__(self, pushed_repository, repositories, token):
         self._token = token

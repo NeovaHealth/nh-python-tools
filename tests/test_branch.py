@@ -1,7 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 
-from jenkins.branch import PushEvent, PropertiesBuilder, RepositoryNew, GithubEvent
+from jenkins.branch import PushEvent, GithubEvent
 
 
 class TestPushEvent(TestCase):
@@ -92,19 +92,3 @@ class TestPushEvent(TestCase):
                          'GIT_URL=http://\nPUSHED_REPO=public-repo\n'
                          'PUSHED_BRANCH=master\nGIT_TYPE=master\nUAT_ON=false'
                          '\nPIPELINE_RUN=1\n')
-
-
-class TestRepository(TestCase):
-
-    def setUp(self):
-        self.json_string = '{"ref": "refs/heads/master", "repository": ' \
-                           '{"name": "public-repo"}}'
-        self.push = PushEvent(GithubEvent(self.json_string)._payload)
-
-    def test_repository(self):
-        r = RepositoryNew.create_repository_from_push_event(self.push)
-        self.assertEqual(r.name, 'public-repo')
-
-    def test_environment_variables(self):
-        r = RepositoryNew('test_name', 'test_branch')
-        self.assertEqual(r.environment_variable, 'TESTNAME_BRANCH')

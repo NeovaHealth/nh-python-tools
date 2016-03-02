@@ -30,31 +30,31 @@ class TestTravisEvent(TestCase):
         result = TravisEvent(self.json_master)
         self.assertEqual(result.is_master(), True)
 
-    def test_TravisEvent_is_master_returns_False_when_not_master_branch(self):
+    def test_TravisEvent_is_master_returns_False_if_not_master_branch(self):
         result = TravisEvent(self.json_develop)
         self.assertEqual(result.is_master(), False)
 
-    def test_TravisEvent_is_develop_returns_True_when_develop_branch(self):
+    def test_TravisEvent_is_develop_returns_True_if_develop_branch(self):
         result = TravisEvent(self.json_develop)
         self.assertEqual(result.is_develop(), True)
 
-    def test_TravisEvent_is_develop_returns_False_when_not_develop_branch(self):
+    def test_TravisEvent_is_develop_returns_False_if_not_develop_branch(self):
         result = TravisEvent(self.json_master)
         self.assertEqual(result.is_develop(), False)
 
-    def test_TravisEvent_is_feature_returns_True_when_feature_branch(self):
+    def test_TravisEvent_is_feature_returns_True_if_feature_branch(self):
         result = TravisEvent(self.json_feature)
         self.assertEqual(result.is_feature(), True)
 
-    def test_TravisEvent_is_feature_returns_False_when_not_feature_branch(self):
+    def test_TravisEvent_is_feature_returns_False_if_not_feature_branch(self):
         result = TravisEvent(self.json_master)
         self.assertEqual(result.is_feature(), False)
 
-    def test_TravisEvent_is_hotfix_returns_True_when_hotfix_branch(self):
+    def test_TravisEvent_is_hotfix_returns_True_if_hotfix_branch(self):
         result = TravisEvent(self.json_hotfix)
         self.assertEqual(result.is_hotfix(), True)
 
-    def test_TravisEvent_is_feature_returns_False_when_not_hotfix_branch(self):
+    def test_TravisEvent_is_feature_returns_False_if_not_hotfix_branch(self):
         result = TravisEvent(self.json_master)
         self.assertEqual(result.is_hotfix(), False)
 

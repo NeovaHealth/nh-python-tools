@@ -3,53 +3,59 @@ import sys
 
 from optparse import OptionParser
 from travis import TravisEvent
-from branch import PropertiesBuilder, PushEvent, GithubEvent, PullRequestEvent
+from branch import BranchPicker, PushEvent, GithubEvent, PullRequestEvent
 from utils import make_environment_variables
 
 
 parser = OptionParser()
-parser.add_option('-e', '--type', type=str, help='Even trigger type', dest='trigger')
+parser.add_option('-e', '--type', type=str, dest='trigger',
+                  help='Even trigger type')
 parser.add_option('-p', '--payload', type=str, dest='payload',
                   help='GitHub payload')
 parser.add_option('-t', '--token', type=str, dest='token',
                   help='GitHub authorization token')
 
 
-
-def github(options):
+def set_github_event_type(options):
     event = GithubEvent(options.payload)
-    repo = PushEvent(event._payload) if event.type == 'push' else PullRequestEvent(event._payload)
+    if event.type == 'push':
+        return PushEvent(event._payload)
+    else:
+        return PullRequestEvent(event._payload)
 
-    repos = PropertiesBuilder(
-        repo,
+
+def github_environment_variables(options):
+    event = set_github_event_type(options)
+    repos = BranchPicker(
+        event,
         [
             'nhclinical', 'openeobs', 'nh-mobile', 'nh-helpers',
             'nh-vmbuilder', 'nh-ansible', 'nh-playbooks', 'nh-vagrant',
             'openeobs-quality-assurance'
         ], options.token
     )
-    print repo.environment_variables + make_environment_variables(repos)
+    return event.environment_variables + make_environment_variables(repos)
 
 
-def travis(options):
-    repo = TravisEvent(options.payload)
-    repos = PropertiesBuilder(
-        repo,
+def travis_environment_variables(options):
+    event = TravisEvent(options.payload)
+    repos = BranchPicker(
+        event,
         [
             'nhclinical', 'openeobs', 'nh-mobile', 'nh-helpers',
             'nh-vmbuilder', 'nh-ansible', 'nh-playbooks', 'nh-vagrant',
             'openeobs-quality-assurance'
         ], options.token
     )
-    print repo.environment_variables + make_environment_variables(repos)
+    return event.environment_variables + make_environment_variables(repos)
 
 
 if __name__ == '__main__':
     (options, args) = parser.parse_args()
     if options.trigger == 'travis':
-        sys.exit(travis(options))
+        print travis_environment_variables(options)
     elif options.trigger == 'github':
-        sys.exit(github(options))
+        print github_environment_variables(options)
     else:
         print "Please supply trigger type '-e' - either 'travis' or 'github'"
-        sys.exit()
+    sys.exit()
