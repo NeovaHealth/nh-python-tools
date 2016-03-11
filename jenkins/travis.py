@@ -1,12 +1,11 @@
 # coding=utf-8
-import json
-import re
+from event import Event
 
 
-class TravisEvent(object):
+class TravisEvent(Event):
 
     def __init__(self, payload):
-        self._payload = json.loads(payload)
+        self._payload = payload
         self.pipeline = "PIPELINE_RUN=1"
         self.uat = "UAT_ON=false"
 
@@ -25,19 +24,6 @@ class TravisEvent(object):
     @property
     def pull_request(self):
         return self._payload['pull_request']
-
-    @property
-    def type(self):
-        if self.is_feature():
-            return "feature"
-        elif self.is_hotfix():
-            return "hotfix"
-        elif self.is_master():
-            return "master"
-        elif self.is_develop():
-            return "develop"
-        else:
-            return "None"
 
     @property
     def git_hash(self):
@@ -77,33 +63,8 @@ class TravisEvent(object):
                   self.uat + '\n' + self.trigger_type + '\n'
         return result
 
-    def is_hotfix(self):
-        if re.match('[h][0-9]+_[a-z_0-9]{4,30}', self.branch):
-            return True
-
-        return False
-
-    def is_feature(self):
-        if re.match('[f][0-9]+_[a-z_0-9]{4,30}', self.branch):
-            return True
-
-        return False
-
-    def is_master(self):
-        if self.branch == 'master':
-            return True
-
-        return False
-
-    def is_develop(self):
-        if self.branch == 'develop':
-            return True
-
-        return False
-
     def is_pull_request(self):
         if self.pull_request != 'false':
             return True
 
         return False
-
